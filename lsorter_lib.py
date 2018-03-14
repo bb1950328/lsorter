@@ -17,4 +17,5 @@ class slideturner():
         return pulse
     def goto_angle(self, angle):
         pulse = calc_pulse(angle)
-        
+        pi.set_servo_pulsewidth(17, pulse)
+        if not verbose:
