@@ -1,6 +1,9 @@
 import pigpio, time, sys, os
+import RPi.GPIO as GPIO
 
 pi = pigpio.pi()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
 
 class slideturner():
     def __init__(self, num_boxes, min_servo=675, max_servo=2350, pin=4):
@@ -19,4 +22,40 @@ class slideturner():
         self.box = box
         pulse = calc_pulse(box, verbose=verbose)
         pi.set_servo_pulsewidth(17, pulse)
-        
+class unipolarstepper():
+    def init(self, pins, stepmode="full"):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
+        wavesteps = [[1, 0, 0, 0],
+                     [0, 1, 0, 0],
+                     [0, 0, 1, 0],
+                     [0, 0, 0, 1]]
+
+        fullsteps = [[1, 1, 0, 0],
+                     [0, 1, 1, 0],
+                     [0, 0, 1, 1],
+                     [1, 0, 0, 1]]
+
+        halfsteps = [[1, 0, 0, 0],
+                     [1, 1, 0, 0],
+                     [0, 1, 0, 0],
+                     [0, 1, 1, 0],
+                     [0, 0, 1, 0],
+                     [0, 0, 1, 1],
+                     [0, 0, 0, 1],
+                     [1, 0, 0, 1]]
+        step = 0
+
+        if stepmode == "wave":
+            stepdata = wavesteps
+        elif stepmode == "full":
+            stepdata = fullsteps
+        elif stepmode == "half":
+            stepdata = halfsteps
+        else:
+            raise ValueError("You have to set stepmode to wave or full or half!")
+
+        for pin in pins:
+            GPIO.setup(pin, GPIO.OUT)
+    def stepout(self, step):
+        dat = 
+        for p in range(4):
+
