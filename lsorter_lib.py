@@ -23,7 +23,7 @@ class slideturner():
         pulse = calc_pulse(box, verbose=verbose)
         pi.set_servo_pulsewidth(17, pulse)
 class unipolarstepper():
-    def init(self, pins, stepmode="full"):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
+    def init(self, pins, stepmode="full", stepperturn = 2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
         wavesteps = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
@@ -42,20 +42,38 @@ class unipolarstepper():
                      [0, 0, 1, 1],
                      [0, 0, 0, 1],
                      [1, 0, 0, 1]]
-        step = 0
 
         if stepmode == "wave":
-            stepdata = wavesteps
+            self.stepdata = wavesteps
         elif stepmode == "full":
-            stepdata = fullsteps
+            self.stepdata = fullsteps
         elif stepmode == "half":
-            stepdata = halfsteps
+            self.stepdata = halfsteps
         else:
             raise ValueError("You have to set stepmode to wave or full or half!")
 
+        self.stepmode = stepmode
+
         for pin in pins:
             GPIO.setup(pin, GPIO.OUT)
+        self.pins = pins
+        self.stepperturn = stepperturn
+        self.stepout(0)
     def stepout(self, step):
-        dat = 
+        dat = self.stepdata[step]
         for p in range(4):
-
+            GPIO.output(self.pins[p], dat[p])
+        self.step = step
+    def makestep(self, dir=True):#dir False | True -> forward | backward
+        step = (self.step-1 if not dir else self.step+1)
+        if self.stepmode == "wave" or self.stepmode == "full":
+            if step == 4:
+                step = 0
+            elif step == -1:
+                step = 3
+        else:#self.stepmode == "half"
+            if step == 8:
+                step = 0
+            elif step == -1:
+                step = 7
+        self.stepout(step)
