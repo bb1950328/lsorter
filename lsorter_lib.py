@@ -24,7 +24,7 @@ class slideturner():
         pulse = calc_pulse(box, verbose=verbose)
         pi.set_servo_pulsewidth(17, pulse)
 class unipolarstepper():
-    def init(self, pins, stepmode="full"):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
+    def init(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
         wavesteps = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
@@ -58,6 +58,7 @@ class unipolarstepper():
             GPIO.setup(pin, GPIO.OUT)
         self.pins = pins
         self.stepmode = stepmode
+        self.stepperturn = stepperturn
     def stepout(self, step):
         dat = self.stepdata
         for p in range(4):
@@ -75,11 +76,17 @@ class unipolarstepper():
         elif st == 4:
             st = 0
         self.stepout(st)
-    def drive_rpm(self, rpm):
-        self.drivethread = Thread(target=self._drive_thread, args=(rpm))
+    def drive_rpm(self, rpm, dir = True):
+        self.drivethread = Thread(target=self._drive_thread, args=(rpm, dir))
         self.thread_is_driving = True
         self.drivethread.start()
     def stop_driving(self):
         self.thread_is_driving = False
-    def _drive_thread(self, rpm):
-        pass
+    def _drive_thread(self, rpm, dir):
+        sleep = 1/self.stepperturn
+        donesteps = 0
+        starttime = time.perf_counter()
+        while self.thread_is_driving:
+            self.makestep(dir)
+            donesteps += 1
+            time.sleep(sleep)
