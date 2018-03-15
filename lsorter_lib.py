@@ -161,4 +161,4 @@ class WebcamAnalyser():
         if not analyse:
             return frame
         else:
-            analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            return analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
