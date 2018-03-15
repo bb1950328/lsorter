@@ -151,7 +151,7 @@ class WebcamAnalyser():
             return 1
         else:
             return 2
-    def process_frame(self, wait_on_motion=0, analyse=True):
+    def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75):
         """wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"""
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
@@ -161,3 +161,4 @@ class WebcamAnalyser():
         if not analyse:
             return frame
         else:
+            analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
