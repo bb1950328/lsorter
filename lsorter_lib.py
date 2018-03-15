@@ -57,6 +57,7 @@ class unipolarstepper():
         for pin in pins:
             GPIO.setup(pin, GPIO.OUT)
         self.pins = pins
+        self.stepmode = stepmode
     def stepout(self, step):
         dat = self.stepdata
         for p in range(4):
@@ -65,7 +66,15 @@ class unipolarstepper():
     def makestep(self, dir=True):
         st = (self.step - 1 if not dir else self.step + 1)
         if self.stepmode == "half":
-            
+            if st == -1:
+                st = 7
+            elif st == 8:
+                st = 0
+        elif st == -1:
+            st = 4
+        elif st == 4:
+            st = 0
+        self.stepout(st)
     def drive_rpm(self, rpm):
         self.drivethread = Thread(target=self._drive_thread, args=(rpm))
         self.thread_is_driving = True
