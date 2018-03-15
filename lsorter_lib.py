@@ -26,11 +26,7 @@ class slideturner():
         pulse = self.calc_pulse(box, verbose=verbose)
         pi.set_servo_pulsewidth(17, pulse)
 class unipolarstepper():
-<<<<<<< HEAD
-    def init(self, pins, stepmode="full", stepperturn = 2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
-=======
     def init(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
->>>>>>> master
         wavesteps = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
@@ -49,10 +45,7 @@ class unipolarstepper():
                      [0, 0, 1, 1],
                      [0, 0, 0, 1],
                      [1, 0, 0, 1]]
-<<<<<<< HEAD
 
-=======
->>>>>>> master
         if stepmode == "wave":
             self.stepdata = wavesteps
         elif stepmode == "full":
@@ -67,34 +60,11 @@ class unipolarstepper():
         for pin in pins:
             GPIO.setup(pin, GPIO.OUT)
         self.pins = pins
-<<<<<<< HEAD
         self.stepperturn = stepperturn
         self.stepout(0)
     def stepout(self, step):
-        dat = self.stepdata[step]
         for p in range(4):
-            GPIO.output(self.pins[p], dat[p])
-        self.step = step
-    def makestep(self, dir=True):#dir False | True -> forward | backward
-        step = (self.step-1 if not dir else self.step+1)
-        if self.stepmode == "wave" or self.stepmode == "full":
-            if step == 4:
-                step = 0
-            elif step == -1:
-                step = 3
-        else:#self.stepmode == "half"
-            if step == 8:
-                step = 0
-            elif step == -1:
-                step = 7
-        self.stepout(step)
-=======
-        self.stepmode = stepmode
-        self.stepperturn = stepperturn
-    def stepout(self, step):
-        dat = self.stepdata
-        for p in range(4):
-            GPIO.output(self.pins[p], dat[p])
+            GPIO.output(self.pins[p], self.stepdata[step][p])
         self.step = step
     def makestep(self, dir=True):
         st = (self.step - 1 if not dir else self.step + 1)
@@ -151,4 +121,3 @@ class WebcamAnalyser():
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:
->>>>>>> master
