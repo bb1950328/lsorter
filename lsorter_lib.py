@@ -1,4 +1,4 @@
-import pigpio, time, sys, os, cv2, matplotlib.pyplot, PIL, numpy, imutils
+import pigpio, time, sys, os, cv2, matplotlib.pyplot, PIL, numpy, imutils, socket
 import RPi.GPIO as GPIO
 from threading import Thread
 from PIL import Image
@@ -95,6 +95,20 @@ class unipolarstepper():
             nexttime += sleep
             while time.perf_counter()<nexttime:
                 time.sleep(0.001)
+#class WebcamAnalyser():
+#    def __init__(self, camport = 0):
+#        self.sock = socketsocket(socket.AF_INET, socket.SOCK_STREAM)
+#        self.sock.connect(("localhost", 12345))
+#        self.sock.send("""
+#        from WebcamAnalyser_py2 import *
+#        wca = WebcamAnalyser({})
+#        """.format(camport).encode())
+#    def wait_for_brick(cam=0, treshold=10000):
+#    def analyse_frame(frame, pxjump=4, tr=400, bt=20, ylen=640, xlen=480, x1crop=0, x2crop=0, y1crop=0, y2crop=0, show_img=False):
+#        "returns color (0=Red, 1=Green, 2=Blue)"
+#    def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75):
+#        "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
+
 class WebcamAnalyser():
     def __init__(self, camport = 0):
         self.camport = camport
@@ -118,7 +132,7 @@ class WebcamAnalyser():
             t = t_plus
             t_plus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
     def analyse_frame(frame, pxjump=4, tr=400, bt=20, ylen=640, xlen=480, x1crop=0, x2crop=0, y1crop=0, y2crop=0, show_img=False):
-        """ returns color (0=Red, 1=Green, 2=Blue)"""
+        "returns color (0=Red, 1=Green, 2=Blue)"
         stat= [0, 0, 0]
         #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         #frame=frame[:, x1crop:-x2crop]
@@ -152,7 +166,7 @@ class WebcamAnalyser():
         else:
             return 2
     def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75):
-        """wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"""
+        "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:

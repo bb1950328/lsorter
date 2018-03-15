@@ -6,7 +6,7 @@ _s1.listen(1)
 while True:
     _komm, _addr = _s1.accept()
     while True:
-        _data = _komm.recv(1024)
+        _data = _komm.recv(8192)
         if not _data:
             _komm.close()
             sys.exit()
