@@ -102,17 +102,16 @@ class WebcamAnalyser():
         d1 = cv2.absdiff(t2, t1)
         d2 = cv2.absdiff(t1, t0)
         return cv2.bitwise_and(d1, d2)
-    def wait_for_brick(cam=0):
-    ##winName = "Movement Indicator"
-    ##cv2.namedWindow(winName)
+    def wait_for_brick(cam=0, treshold=10000):
         t_minus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
         t = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
         t_plus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
         while True:
-        #start = time.perf_counter()
             dimg=diffImg(t_minus, t, t_plus)
-            print("M: ", cv2.countNonZero(dimg))
-        # Read next image
+            nz = cv2.countNonZero(dimg))
+            if nz > treshold:
+                return nz
+            print("M: ", nz, "=not enough.")
             t_minus = t
             t = t_plus
             t_plus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
