@@ -1,5 +1,6 @@
 import pigpio, time, sys, os
 import RPi.GPIO as GPIO
+from threading import Thread
 
 pi = pigpio.pi()
 GPIO.setwarnings(False)
@@ -45,17 +46,22 @@ class unipolarstepper():
         step = 0
 
         if stepmode == "wave":
-            stepdata = wavesteps
+            self.stepdata = wavesteps
         elif stepmode == "full":
-            stepdata = fullsteps
+            self.stepdata = fullsteps
         elif stepmode == "half":
-            stepdata = halfsteps
+            self.stepdata = halfsteps
         else:
             raise ValueError("You have to set stepmode to wave or full or half!")
 
         for pin in pins:
             GPIO.setup(pin, GPIO.OUT)
+        self.pins = pins
     def stepout(self, step):
-        dat = 
+        dat = self.stepdata
         for p in range(4):
-
+            GPIO.output(self.pins[p], dat[p])
+        self.step = step
+    def drive_rpm(self, rpm):
+        self.drivethread = Thread(target=self._drive_thread, args=(rpm))
+        self.drivethread.start()
