@@ -99,5 +99,7 @@ class WebcamAnalyser():
         self.vstream = WebcamVideoStream(src=0).start()
         self.fps = FPS().start()
     def readframe(self, wait_on_motion=0):#wait_on_motion = treshold num of pixels changed 0 = disable
-        pass
+        if wait_on_motion < 0:
+            raise ValueError("wait_on_motion must be positive!")
+        
     
