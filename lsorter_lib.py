@@ -1,6 +1,8 @@
-import pigpio, time, sys, os
+import pigpio, time, sys, os, cv2, matplotlib.pyplot, PIL, numpy, imutils
 import RPi.GPIO as GPIO
 from threading import Thread
+from PIL import Image
+from imutils.video import WebcamVideoStream, FPS
 
 pi = pigpio.pi()
 GPIO.setwarnings(False)
@@ -91,3 +93,6 @@ class unipolarstepper():
             nexttime += sleep
             while time.perf_counter()<nexttime:
                 time.sleep(0.001)
+class WebcamAnalyser():
+    def __init__(self, camport = 0):
+        self.camport = camport
