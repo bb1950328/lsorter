@@ -21,7 +21,7 @@ class slideturner():
         return pulse
     def goto_angle(self, box, verbose=True):
         self.box = box
-        pulse = calc_pulse(box, verbose=verbose)
+        pulse = self.calc_pulse(box, verbose=verbose)
         pi.set_servo_pulsewidth(17, pulse)
 class unipolarstepper():
     def init(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
@@ -43,8 +43,6 @@ class unipolarstepper():
                      [0, 0, 1, 1],
                      [0, 0, 0, 1],
                      [1, 0, 0, 1]]
-        step = 0
-
         if stepmode == "wave":
             self.stepdata = wavesteps
         elif stepmode == "full":
@@ -86,7 +84,10 @@ class unipolarstepper():
         sleep = 1/self.stepperturn
         donesteps = 0
         starttime = time.perf_counter()
+        nexttime = starttime + sleep
         while self.thread_is_driving:
             self.makestep(dir)
             donesteps += 1
-            time.sleep(sleep)
+            nexttime += sleep
+            while time.perf_counter()<nexttime:
+                time.sleep(0.001)
