@@ -62,6 +62,15 @@ class unipolarstepper():
         for p in range(4):
             GPIO.output(self.pins[p], dat[p])
         self.step = step
+    def makestep(self, dir=True):
+        st = (self.step - 1 if not dir else self.step + 1)
+        if self.stepmode == "half":
+            
     def drive_rpm(self, rpm):
         self.drivethread = Thread(target=self._drive_thread, args=(rpm))
+        self.thread_is_driving = True
         self.drivethread.start()
+    def stop_driving(self):
+        self.thread_is_driving = False
+    def _drive_thread(self, rpm):
+        pass
