@@ -27,6 +27,7 @@ class WebcamAnalyser():
             dimg=self.diffImg(t_minus, t, t_plus)
             nz = cv2.countNonZero(dimg)
             if nz > treshold:
+                print (nz, "px are enough <", treshold)
                 return nz
             print(nz, "px are not enough.")
             t_minus = t
@@ -39,11 +40,13 @@ class WebcamAnalyser():
         #frame=frame[:, x1crop:-x2crop]
         if show_img:
             matplotlib.pyplot.imshow(frame)
+        pxcount = 0
         for y in range(y1crop, ylen-y2crop, pxjump):
             for x in range(x1crop, xlen-x2crop, pxjump):
-                print stat
+                #print stat
                 rgb = frame[x, y]
-                print rgb
+                #print rgb
+                #print
                 r = rgb[2]
                 g = rgb[1]
                 b = rgb[0]
@@ -59,6 +62,9 @@ class WebcamAnalyser():
                     return "Green"
                 elif stat[2]-tr>stat[0] and stat[2]-tr>stat[1]:
                     return "Blue"
+                if pxcount>10000:
+                    return "white"
+                pxcount += 1
         r = stat[0]
         g = stat[1]
         b = stat[2]
@@ -73,32 +79,33 @@ class WebcamAnalyser():
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:
-            self.wait_for_brick(wait_on_motion)
+            self.wait_for_brick(o, treshold=wait_on_motion)
         frame = self.vstream.read()
         if save_on_desktop:
-            pass#frame).save("/home/pi/Desktop")
+            cv2.imwrite("/home/pi/Desktop/captured.png", frame)
         if not analyse:
             return frame
         else:
             return self.analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
-wait_on_motion=0
+wait_on_motion=150000
 analyse=True
 pxjump=4
 tr=400
-bt=3
+bt=30
 x1crop=75
 x2crop=75
 try:
-    so.bind(("localhost", 12345))
+    si.bind(("localhost", 12345))
     while True:
-        data, addr = so.recvfrom(1024)
+        data, addr = si.recvfrom(1024)
         data = data.decode()
         print "[" + str(addr) + "] has sent \"" + data + "\""
         if data == "wait":
             aw = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = True)
-            so.sendto(aw.encode(), ("localhost", 12345))
+            so.sendto(aw.encode(), ("localhost", 54321))
             print "sent back " + aw
 finally:
     so.close()
