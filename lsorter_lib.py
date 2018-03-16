@@ -23,29 +23,33 @@ from threading import Thread
 print("imported modules")
 
 if on_pi:
+    os.system("pigpiod")
     pi = pigpio.pi()
 
 class slideturner():
     def __init__(self, num_boxes, min_servo=675, max_servo=2350, pin=4):
         self.num_boxes = num_boxes
         self.min_servo, self.max_servo = min_servo, max_servo
+        self.pin = pin
         if num_boxes < 1:
             raise ValueError("You must init at least one box")
         if on_pi:
             pi.set_mode(pin, pigpio.OUTPUT)
+            print("setmode")
         else:
             print("[would setup pin {} to servo if there are pins]".format(pin))
     def calc_pulse(self, box, verbose=True):#box is from 0 to self.num_boxes-1
         angle = 180/self.num_boxes * (box+0.5)
         pulse = (angle/180*(self.max_servo - self.min_servo)) + self.min_servo
         if not verbose:
-            print("Angle:", angle, "\nPulselength:", pulse)
+            print("Angle:", angle, "\tPulselength:", pulse)
         return pulse
     def goto_angle(self, box, verbose=True):
         self.box = box
         pulse = self.calc_pulse(box, verbose=verbose)
         if on_pi:
-            pi.set_servo_pulsewidth(17, pulse)
+            pi.set_servo_pulsewidth(self.pin, pulse)
+            print("setservo")
         else:
             print("[would set servo to {}ms if there's a servo.]".format(pulse))
 class unipolarstepper():
@@ -85,6 +89,9 @@ class unipolarstepper():
         self.stepperturn = stepperturn
         self.stepout(0)
     def stepout(self, step):
+        #if self.stepmode == "wave":
+        #    pi.write(self.pins[(step+1 if dir else step-1)], 0)
+        #    pi.write(self.pins[step], 1)
         if on_pi:
             for p in range(4):
                 pi.write(self.pins[p], self.stepdata[step][p])
