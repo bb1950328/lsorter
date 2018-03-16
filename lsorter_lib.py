@@ -1,6 +1,6 @@
 try:
     import pigpio
-    import RPi.GPIO as GPIO
+    #import RPi.GPIO as GPIO
 except ModuleNotFoundError:
     print("pigpio or RPi.GPIO can't be found.")
     on_pi = False
@@ -10,22 +10,20 @@ else:
 import time
 import sys
 import os
-import cv2
-import matplotlib.pyplot
-import PIL
+#import cv2
+#import matplotlib.pyplot
+#import PIL
 import numpy
-import imutils
+#import imutils
 import socket
 from threading import Thread
-from PIL import Image
-from imutils.video import WebcamVideoStream, FPS
+#from PIL import Image
+#from imutils.video import WebcamVideoStream, FPS
 
 print("imported modules")
 
 if on_pi:
     pi = pigpio.pi()
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
 
 class slideturner():
     def __init__(self, num_boxes, min_servo=675, max_servo=2350, pin=4):
@@ -80,7 +78,7 @@ class unipolarstepper():
         self.stepmode = stepmode
         if on_pi:
             for pin in pins:
-                GPIO.setup(pin, GPIO.OUT)
+                pi.set_mode(pin, pigpio.OUTPUT)
         else:
             print("[would setup pins {} to GPIO.out if there are pins]".format(pins))
         self.pins = pins
@@ -89,7 +87,7 @@ class unipolarstepper():
     def stepout(self, step):
         if on_pi:
             for p in range(4):
-                GPIO.output(self.pins[p], self.stepdata[step][p])
+                pi.write(self.pins[p], self.stepdata[step][p])
         else:
             print("[would set pins {} to step {} ({}) if there are pins]".format(self.pins, step, self.stepdata[step]))
         self.step = step
