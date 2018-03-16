@@ -51,7 +51,7 @@ class slideturner():
         else:
             print("[would set servo to {}ms if there's a servo.]".format(pulse))
 class unipolarstepper():
-    def init(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
+    def __init__(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
         wavesteps = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
@@ -93,26 +93,31 @@ class unipolarstepper():
         else:
             print("[would set pins {} to step {} ({}) if there are pins]".format(self.pins, step, self.stepdata[step]))
         self.step = step
-    def makestep(self, dir=True):
+    def makestep(self, dir=True, verbose=True):
         st = (self.step - 1 if not dir else self.step + 1)
+        if not verbose:
+            print("st before: {}".format(st))
         if self.stepmode == "half":
             if st == -1:
                 st = 7
             elif st == 8:
                 st = 0
         elif st == -1:
-            st = 4
+            st = 3
         elif st == 4:
             st = 0
+        if not verbose:
+            print("st after: {}".format(st))
         self.stepout(st)
     def drive_rpm(self, rpm, dir = True):
+        """if rpm<0 rpm means sleep between steps"""
         self.drivethread = Thread(target=self._drive_thread, args=(rpm, dir))
         self.thread_is_driving = True
         self.drivethread.start()
     def stop_driving(self):
         self.thread_is_driving = False
     def _drive_thread(self, rpm, dir):
-        sleep = 1/self.stepperturn
+        sleep = (1/self.stepperturn*rpm if rpm>0 else -rpm)
         donesteps = 0
         starttime = time.perf_counter()
         nexttime = starttime + sleep
