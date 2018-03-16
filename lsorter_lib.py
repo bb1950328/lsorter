@@ -117,7 +117,13 @@ class unipolarstepper():
     def stop_driving(self):
         self.thread_is_driving = False
     def _drive_thread(self, rpm, dir):
-        sleep = (1/self.stepperturn*rpm if rpm>0 else -rpm)
+        if rpm>0:
+            drivepersleep = True
+            sleep = 1/self.stepperturn*rpm
+        else:
+            drivepersleep = False
+            sleep = -rpm
+        print("started d_drive_thread with rpm={}, sleep={} and drivepersleep={}".format(rpm, sleep, drivepersleep))
         donesteps = 0
         starttime = time.perf_counter()
         nexttime = starttime + sleep
