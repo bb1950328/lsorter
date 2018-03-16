@@ -1,12 +1,29 @@
-import pigpio, time, sys, os, cv2, matplotlib.pyplot, PIL, numpy, imutils, socket
-import RPi.GPIO as GPIO
+try:
+    import pigpio
+    import RPi.GPIO as GPIO
+except ModuleNotFoundError:
+    print("pigpio or RPi.GPIO can't be found.")
+    on_pi = False
+else:
+    print("Raspi-specific modules loaded correctly.")
+    on_pi = True
+import time
+import sys
+import os
+import cv2
+import matplotlib.pyplot
+import PIL
+import numpy
+import imutils
+import socket
 from threading import Thread
 from PIL import Image
 from imutils.video import WebcamVideoStream, FPS
 
-pi = pigpio.pi()
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
+if on_pi:
+    pi = pigpio.pi()
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
 
 class slideturner():
     def __init__(self, num_boxes, min_servo=675, max_servo=2350, pin=4):
@@ -14,7 +31,10 @@ class slideturner():
         self.min_servo, self.max_servo = min_servo, max_servo
         if num_boxes < 1:
             raise ValueError("You must init at least one box")
-        pi.set_mode(pin, pigpio.OUTPUT)
+        if on_pi:
+            pi.set_mode(pin, pigpio.OUTPUT)
+        else:
+            print("[would setup pin {} to servo if there are pins]".format(pin))
     def calc_pulse(self, box, verbose=True):#box is from 0 to self.num_boxes-1
         angle = 180/self.num_boxes * (box+0.5)
         pulse = (angle/180*(self.max_servo - self.min_servo)) + self.min_servo
@@ -24,19 +44,20 @@ class slideturner():
     def goto_angle(self, box, verbose=True):
         self.box = box
         pulse = self.calc_pulse(box, verbose=verbose)
-        pi.set_servo_pulsewidth(17, pulse)
+        if on_pi:
+            pi.set_servo_pulsewidth(17, pulse)
+        else:
+            print("[would set servo to {}ms if there's a servo.]".format(pulse))
 class unipolarstepper():
     def init(self, pins, stepmode="full", stepperturn=2048):#stepmode = wave | full | half, pins = [blue, pink, yellow, orange] in BCM
         wavesteps = [[1, 0, 0, 0],
                      [0, 1, 0, 0],
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]]
-
         fullsteps = [[1, 1, 0, 0],
                      [0, 1, 1, 0],
                      [0, 0, 1, 1],
                      [1, 0, 0, 1]]
-
         halfsteps = [[1, 0, 0, 0],
                      [1, 1, 0, 0],
                      [0, 1, 0, 0],
@@ -45,7 +66,6 @@ class unipolarstepper():
                      [0, 0, 1, 1],
                      [0, 0, 0, 1],
                      [1, 0, 0, 1]]
-
         if stepmode == "wave":
             self.stepdata = wavesteps
         elif stepmode == "full":
@@ -56,15 +76,20 @@ class unipolarstepper():
             raise ValueError("You have to set stepmode to wave or full or half!")
 
         self.stepmode = stepmode
-
-        for pin in pins:
-            GPIO.setup(pin, GPIO.OUT)
+        if on_pi:
+            for pin in pins:
+                GPIO.setup(pin, GPIO.OUT)
+        else:
+            print("[would setup pins {} to GPIO.out if there are pins]".format(pins))
         self.pins = pins
         self.stepperturn = stepperturn
         self.stepout(0)
     def stepout(self, step):
-        for p in range(4):
-            GPIO.output(self.pins[p], self.stepdata[step][p])
+        if on_pi:
+            for p in range(4):
+                GPIO.output(self.pins[p], self.stepdata[step][p])
+        else:
+            print("[would set pins {} to step {} ({}) if there are pins]".format(self.pins, step, self.stepdata[step]))
         self.step = step
     def makestep(self, dir=True):
         st = (self.step - 1 if not dir else self.step + 1)
@@ -118,7 +143,7 @@ class WebcamAnalyser():
         d1 = cv2.absdiff(t2, t1)
         d2 = cv2.absdiff(t1, t0)
         return cv2.bitwise_and(d1, d2)
-    def wait_for_brick(cam=0, treshold=10000):
+    def wait_for_brick(self, cam=0, treshold=10000):
         t_minus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
         t = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
         t_plus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
@@ -131,11 +156,9 @@ class WebcamAnalyser():
             t_minus = t
             t = t_plus
             t_plus = cv2.cvtColor(capture_img(cam), cv2.COLOR_RGB2GRAY)
-    def analyse_frame(frame, pxjump=4, tr=400, bt=20, ylen=640, xlen=480, x1crop=0, x2crop=0, y1crop=0, y2crop=0, show_img=False):
+    def analyse_frame(self, frame, pxjump=4, tr=400, bt=20, ylen=640, xlen=480, x1crop=0, x2crop=0, y1crop=0, y2crop=0, show_img=False):
         "returns color (0=Red, 1=Green, 2=Blue)"
         stat= [0, 0, 0]
-        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #frame=frame[:, x1crop:-x2crop]
         if show_img:
             matplotlib.pyplot.imshow(frame)
         for y in range(y1crop, ylen-y2crop, pxjump):
@@ -175,4 +198,4 @@ class WebcamAnalyser():
         if not analyse:
             return frame
         else:
-            return analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            return self.analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
