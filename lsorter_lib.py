@@ -20,6 +20,8 @@ from threading import Thread
 from PIL import Image
 from imutils.video import WebcamVideoStream, FPS
 
+print("imported modules")
+
 if on_pi:
     pi = pigpio.pi()
     GPIO.setwarnings(False)
@@ -199,3 +201,4 @@ class WebcamAnalyser():
             return frame
         else:
             return self.analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+print("Initalised classes.")
