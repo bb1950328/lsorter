@@ -225,6 +225,7 @@ class Coordinator():
         self.belt.drive_rpm(0)
         while True:
             self.so.sendto(b"wait", ("localhost", 12345))
+            print("sent request.")
             data = self.si.recv(1024)
             print(data)
 

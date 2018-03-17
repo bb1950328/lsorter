@@ -62,8 +62,8 @@ class WebcamAnalyser():
                     return "Green"
                 elif stat[2]-tr>stat[0] and stat[2]-tr>stat[1]:
                     return "Blue"
-                if pxcount>10000:
-                    return "white"
+                #if pxcount>100000:
+                    #return "white"
                 pxcount += 1
         r = stat[0]
         g = stat[1]
@@ -79,7 +79,7 @@ class WebcamAnalyser():
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:
-            self.wait_for_brick(o, treshold=wait_on_motion)
+            self.wait_for_brick(0, treshold=wait_on_motion)
         frame = self.vstream.read()
         if save_on_desktop:
             cv2.imwrite("/home/pi/Desktop/captured.png", frame)
@@ -90,7 +90,7 @@ class WebcamAnalyser():
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
-wait_on_motion=150000
+wait_on_motion=350000
 analyse=True
 pxjump=4
 tr=400
