@@ -27,9 +27,9 @@ class WebcamAnalyser():
             dimg=self.diffImg(t_minus, t, t_plus)
             nz = cv2.countNonZero(dimg)
             if nz > treshold:
-                print (nz, "px are enough <", treshold)
+                print (nz, "px are enough >", treshold)
                 return nz
-            print(nz, "px are not enough.")
+            print nz, "px are not enough."
             t_minus = t
             t = t_plus
             t_plus = cv2.cvtColor(self.capture_img(cam), cv2.COLOR_RGB2GRAY)
@@ -43,9 +43,12 @@ class WebcamAnalyser():
         pxcount = 0
         for y in range(y1crop, ylen-y2crop, pxjump):
             for x in range(x1crop, xlen-x2crop, pxjump):
-                #print stat
+                
+                print
+                print "xy: ", x, y
                 rgb = frame[x, y]
-                #print rgb
+                print "BGR=", rgb
+                print "Stat=", stat
                 #print
                 r = rgb[2]
                 g = rgb[1]
@@ -80,9 +83,10 @@ class WebcamAnalyser():
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:
             self.wait_for_brick(0, treshold=wait_on_motion)
+            time.sleep(4)
         frame = self.vstream.read()
         if save_on_desktop:
-            cv2.imwrite("/home/pi/Desktop/captured.png", frame)
+            cv2.imwrite("captured.png", frame)
         if not analyse:
             return frame
         else:
@@ -90,7 +94,7 @@ class WebcamAnalyser():
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
-wait_on_motion=350000
+wait_on_motion=140000
 analyse=True
 pxjump=4
 tr=400
@@ -99,6 +103,7 @@ x1crop=75
 x2crop=75
 try:
     si.bind(("localhost", 12345))
+    print "listening on port 12345..."
     while True:
         data, addr = si.recvfrom(1024)
         data = data.decode()
