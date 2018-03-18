@@ -77,27 +77,91 @@ class WebcamAnalyser():
             return 1
         else:
             return 2
+    def analyse_frame2(self, frame, ppxjump=4, tr=400, bt=20, xlen=640, ylen=480, x1crop=0, x2crop=0, y1crop=0, y2crop=0, show_img=False):
+        "returns color (0=Red, 1=Green, 2=Blue)"
+        stat= [0, 0, 0]
+        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #frame=frame[:, x1crop:-x2crop]
+        if show_img:
+            matplotlib.pyplot.imshow(frame)
+        pxcount = 0
+        pxjump = ppxjump
+        x, y = x1crop, y1crop
+        x2crop, y2crop = xlen-x2crop-1, ylen-y2crop-1
+        print frame.size
+        while y<y2crop:
+            while x<x2crop:
+                #print
+                #print "xy: ", x, y
+                rgb = frame[y, x]
+                #print "BGR=", rgb
+                #print "Stat=", stat
+                #print
+                r = rgb[2]
+                g = rgb[1]
+                b = rgb[0]
+                if (g<= 50) and (b<= 50) and (r>= 60):# and sum(rgb)>200:
+                    stat[0] +=1
+                    print "found red px."
+                    pxjump = 1
+                elif (r<= 50) and (b<= 50) and (g>= 60):
+                    stat[1] +=1
+                    print "found green px."
+                    pxjump = 1
+                elif (r<= 50) and (g<= 50) and (b>= 60):
+                    stat[2] +=1
+                    print "found blue px."
+                    pxjump = 1
+                else:
+                    pxjump = ppxjump
+                    #print "found nothing."
+                if stat[0]-tr>stat[1] and stat[0]-tr>stat[2]:
+                    return "Red"
+                elif stat[1]-tr>stat[0] and stat[1]-tr>stat[2]:
+                    return "Green"
+                elif stat[2]-tr>stat[0] and stat[2]-tr>stat[1]:
+                    return "Blue"
+                #if pxcount>100000:
+                    #return "white"
+                pxcount += 1
+                x += pxjump
+            x = x1crop
+            y += pxjump
+            print y
+        print "not enough stat"
+        r = stat[0]
+        g = stat[1]
+        b = stat[2]
+        if r>g and r>b:
+            return "Red"
+        elif g>r and g>b:
+            return "Green"
+        else:
+            return "Blue"
     def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
         if wait_on_motion < 0:
             raise ValueError("wait_on_motion must be positive!")
         if wait_on_motion:
             self.wait_for_brick(0, treshold=wait_on_motion)
-            time.sleep(4)
+            #time.sleep(4)
         frame = self.vstream.read()
         if save_on_desktop:
-            cv2.imwrite("captured.png", frame)
+            cv2.imwrite("captured" + str(time.time()) + ".png", frame)
         if not analyse:
             return frame
         else:
-            return self.analyse_frame(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            start = time.time()
+            n = self.analyse_frame2(frame, ppxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            stop = time.time()
+            return (n, max(0, 2-(stop-start)))
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
-wait_on_motion=140000
+wait_on_motion=160000
 analyse=True
-pxjump=4
-tr=400
+pxjump=16
+tr=4
 bt=30
 x1crop=75
 x2crop=75
@@ -109,8 +173,9 @@ try:
         data = data.decode()
         print "[" + str(addr) + "] has sent \"" + data + "\""
         if data == "wait":
-            aw = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = True)
-            so.sendto(aw.encode(), ("localhost", 54321))
-            print "sent back " + aw
+            c, d = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = True)
+            so.sendto(c.encode(), ("localhost", 54321))
+            so.sendto(str(d).encode(), ("localhost", 54321))
+            print "sent back " + c, d
 finally:
     so.close()
