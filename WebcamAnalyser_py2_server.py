@@ -7,6 +7,7 @@ import cv2
 import socket
 #from threading import Thread
 from imutils.video import WebcamVideoStream, FPS
+import sys
 
 class WebcamAnalyser():
     def __init__(self, camport = 0):
@@ -138,6 +139,44 @@ class WebcamAnalyser():
             return "Green"
         else:
             return "Blue"
+    def analyse_firstrow(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
+        frame = self.vstream.read()
+        if save_on_desktop:
+            cv2.imwrite("captured" + str(time.time()) + ".png", frame)
+        stat= [0, 0, 0]
+        x = x1crop
+        ppxjump = pxjump
+        x2crop = 640-x2crop-1
+        while x < x2crop:
+            rgb = frame[1, x]
+            #print "BGR=", rgb
+            #print "Stat=", stat
+            #print
+            r = rgb[2]
+            g = rgb[1]
+            b = rgb[0]
+            if (g<= 50) and (b<= 50) and (r>= 60):# and sum(rgb)>200:
+                stat[0] +=1
+                print "found red px."
+                pxjump = 1
+            elif (r<= 50) and (b<= 50) and (g>= 60):
+                stat[1] +=1
+                print "found green px."
+                pxjump = 1
+            elif (r<= 50) and (g<= 50) and (b>= 60):
+                stat[2] +=1
+                print "found blue px."
+                pxjump = 1
+            else:
+                pxjump = ppxjump
+            if stat[0]-tr>stat[1] and stat[0]-tr>stat[2]:
+                return "Red"
+            elif stat[1]-tr>stat[0] and stat[1]-tr>stat[2]:
+                return "Green"
+            elif stat[2]-tr>stat[0] and stat[2]-tr>stat[1]:
+                return "Blue"
+            x += pxjump
+        return
     def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
         if wait_on_motion < 0:
@@ -152,19 +191,32 @@ class WebcamAnalyser():
             return frame
         else:
             start = time.time()
-            n = self.analyse_frame2(frame, ppxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            n = self.analyse_firstrow(pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
             stop = time.time()
-            return (n, max(0, 2-(stop-start)))
+            return (n, max(0, 8.25-(stop-start)))
+    def whitelog(self, n=10):
+        f = open("whitelog.csv", "a")
+        for i in range(10):
+            frame = self.vstream.read()
+            for row in frame:
+                for px in row:
+                    #print px
+                    f.writelines(str(px[0]) + ", " + str(px[1]) +", " +  str(px[2]) + "\n")
+        f.close()
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
-wait_on_motion=160000
+wait_on_motion=0
 analyse=True
 pxjump=16
-tr=4
+tr=1
 bt=30
 x1crop=75
 x2crop=75
+###
+wc.whitelog()
+sys.exit()
+###
 try:
     si.bind(("localhost", 12345))
     print "listening on port 12345..."
@@ -173,9 +225,13 @@ try:
         data = data.decode()
         print "[" + str(addr) + "] has sent \"" + data + "\""
         if data == "wait":
-            c, d = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = True)
+            c = None
+            while not c:
+                c, d = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = False)
+                print c, d
             so.sendto(c.encode(), ("localhost", 54321))
             so.sendto(str(d).encode(), ("localhost", 54321))
             print "sent back " + c, d
+            time.sleep(0.1)
 finally:
     so.close()
