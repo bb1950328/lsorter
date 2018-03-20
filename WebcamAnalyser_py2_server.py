@@ -9,6 +9,17 @@ import socket
 from imutils.video import WebcamVideoStream, FPS
 import sys
 
+"""
+R    G    B     Index   Name
+(255,   0,   0)     0   Red
+(  0, 255,   0)     1   Green
+(  0,   0, 255)     2   Blue
+(255, 255,   0)     3   Yellow
+(160, 160, 160)     4   Light Gray
+( 80,  80,  80)     5   Dark Gray
+(  0,   0,   0)     6   Black
+
+"""
 class WebcamAnalyser():
     def __init__(self, camport = 0):
         self.camport = camport
