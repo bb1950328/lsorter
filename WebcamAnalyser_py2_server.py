@@ -10,6 +10,7 @@ from imutils.video import WebcamVideoStream, FPS
 import sys
 import numpy
 from Tkinter import *
+import pickle
 """
 R    G    B     Index   Name
 (255,   0,   0)     0   Red
@@ -208,6 +209,7 @@ class WebcamAnalyser():
         return
     def analyse_firstrow2(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         frame = self.vstream.read()
+        so2.sendto(pickle.dumps(frame[1]), ("192.168.178.31", 56789))
         stat= numpy.zeros(8)
         x = x1crop
         ppxjump = pxjump
@@ -247,6 +249,7 @@ class WebcamAnalyser():
                     f.writelines(str(px[0]) + ", " + str(px[1]) +", " +  str(px[2]) + "\n")
         f.close()
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+so2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
 wait_on_motion=0
