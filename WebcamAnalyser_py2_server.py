@@ -8,23 +8,33 @@ import socket
 #from threading import Thread
 from imutils.video import WebcamVideoStream, FPS
 import sys
-
+import numpy
+from Tkinter import *
+import pickle
 """
 R    G    B     Index   Name
 (255,   0,   0)     0   Red
-(  0, 255,   0)     1   Green
-(  0,   0, 255)     2   Blue
+(  0, 100,  10)     1   Green
+(  0,  35, 255)     2   Blue
 (255, 255,   0)     3   Yellow
 (160, 160, 160)     4   Light Gray
-( 80,  80,  80)     5   Dark Gray
+( 30,  30,  30)     5   Dark Gray
 (  0,   0,   0)     6   Black
-
+( 30, 100, 100)     7   White
 """
 class WebcamAnalyser():
     def __init__(self, camport = 0):
         self.camport = camport
         self.vstream = WebcamVideoStream(src=0).start()
         self.fps = FPS().start()
+        self.rgbcolors = numpy.array(((255,   0,   0), (  0, 100,   10), (  0,  35, 255), (255, 255,   0), (160, 160, 160), ( 30,  30,  30), (  0,   0,   0), (30, 100, 100)))
+        self.wordcolors = ["Red", "Green", "Blue", "Yellow", "Light Gray", "Dark Gray", "Black", "White"]
+        try:
+            self.tkroot = Tk()
+            self.tkcanvas = Canvas(tkroot, width = 320, height=320)
+            self.tkcanvas.pack()
+        except:
+            pass
     def capture_img(self, cam):
         return self.vstream.read()
     def diffImg(self, t0, t1, t2):
@@ -150,6 +160,15 @@ class WebcamAnalyser():
             return "Green"
         else:
             return "Blue"
+    def next_color(self, value):
+        sums = []
+        for i in range(8):
+            s = numpy.sum(numpy.abs(value-self.rgbcolors[i]))
+            sums.append(s)
+        sums = numpy.array(sums)
+        am = numpy.argmin(sums)
+        print value, "appears to be ", am
+        return am
     def analyse_firstrow(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         frame = self.vstream.read()
         if save_on_desktop:
@@ -188,6 +207,21 @@ class WebcamAnalyser():
                 return "Blue"
             x += pxjump
         return
+    def analyse_firstrow2(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
+        frame = self.vstream.read()
+        so2.sendto(pickle.dumps(frame[1]), ("192.168.178.31", 56789))
+        stat= numpy.zeros(8)
+        x = x1crop
+        ppxjump = pxjump
+        x2crop = 640-x2crop-1
+        while x < x2crop:
+            stat[self.next_color(frame[1, x])] += 1
+            if numpy.max(stat) >= tr:
+                am = numpy.argmax(stat)
+                if am != 7 and save_on_desktop:
+                    cv2.imwrite("captured" + str(time.time()) + ".png", frame)
+                return am
+            x += 1
     def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
         if wait_on_motion < 0:
@@ -202,7 +236,7 @@ class WebcamAnalyser():
             return frame
         else:
             start = time.time()
-            n = self.analyse_firstrow(pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            n = self.wordcolors[self.analyse_firstrow2(pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)]
             stop = time.time()
             return (n, max(0, 8.25-(stop-start)))
     def whitelog(self, n=10):
@@ -215,34 +249,34 @@ class WebcamAnalyser():
                     f.writelines(str(px[0]) + ", " + str(px[1]) +", " +  str(px[2]) + "\n")
         f.close()
 so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+so2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 wc = WebcamAnalyser()
 wait_on_motion=0
 analyse=True
 pxjump=16
-tr=1
+tr=5
 bt=30
 x1crop=75
 x2crop=75
 ###
-wc.whitelog()
-sys.exit()
 ###
 try:
     si.bind(("localhost", 12345))
     print "listening on port 12345..."
+    data = "wait"
     while True:
-        data, addr = si.recvfrom(1024)
-        data = data.decode()
-        print "[" + str(addr) + "] has sent \"" + data + "\""
         if data == "wait":
             c = None
             while not c:
-                c, d = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = False)
+                c, d = wc.process_frame(wait_on_motion, analyse, pxjump, tr, bt, x1crop, x2crop, save_on_desktop = True)
                 print c, d
             so.sendto(c.encode(), ("localhost", 54321))
             so.sendto(str(d).encode(), ("localhost", 54321))
             print "sent back " + c, d
             time.sleep(0.1)
+        data, addr = si.recvfrom(1024)
+        data = data.decode()
+        print "[" + str(addr) + "] has sent \"" + data + "\""
 finally:
     so.close()
