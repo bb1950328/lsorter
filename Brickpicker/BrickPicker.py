@@ -191,7 +191,16 @@ sscrollb.pack(side = "left", anchor = "w", expand=True, fill="y")
 #---------------------------------------------------------------------------
 
 def preciseaddcmd(*args):
-    pass
+    ss = list(stree.selection())
+    cs = list(ctree.selection())
+    bs = list(btree.selection())
+    print(ss, cs, bs)
+    for sn in ss:
+        si = stree.item(sn)
+        print(si)
+        for cn in cs:
+            for bn in bs:
+                pass
 def brickaddcmd(*args):
     pass
 def coloraddcmd(*args):
@@ -238,11 +247,11 @@ view.pack(side="left", fill="y")
 vtree = Treeview(view)
 vscrollb = Scrollbar(view)
 
-vtree["columns"]=("Category", "ID", "Color")
-vtree.column("Category", width=100)
+vtree["columns"]=("Category", "Brick ID", "Color")
+vtree.column("Category", width=50)
 vtree.heading("Category", text="Category", command=lambda: treeview_sort_column_numeric(vtree, "Category", 0, False))
-vtree.column("ID", width=100)
-vtree.heading("ID", text="ID", command=lambda: treeview_sort_column_numeric(vtree, "ID", 0, False))
+vtree.column("Brick ID", width=50)
+vtree.heading("Brick ID", text="Brick ID", command=lambda: treeview_sort_column_numeric(vtree, "Brick ID", 0, False))
 vtree.column("Color", width=100)
 vtree.heading("Color", text="Color", command=lambda: treeview_sort_column_numeric(vtree, "Color", 0, False))
 vtree["yscrollcommand"] = vscrollb.set
@@ -283,8 +292,44 @@ colorlbl.grid(row=4, column=0, sticky="w")
 colorlbl2 = Label(infoframe)
 colorlbl2.grid(row=4, column=1, sticky="w")
 
-def update_selection(sel_list):#sel_list = [brick_id, category_id, color_id]
-    pass
+def add_to_selection(brick_id, category_id, color_id):#None if not specified
+    bid = (brick_id if brick_id else "")
+    if brick_id:
+        for p in partarray:
+            if p[0] == brick_id:
+                brick_name = p[1]
+                category_id = p[2]
+                break
+        if not brick_name:
+            raise ValueError("Part with Id {} doesn't exist!".format(brick_id))
+            return
+    else:
+        brick_name = "All"
+    if category_id:
+        for c in categoriesarray:
+            if c[0] == category_id:
+                category_name = c[1]
+                break
+        if not category_name:
+            raise ValueError("Category with Id {} doesn't exist!".format(category_id))
+            return
+        catstr = "{} ({})".format(category_name, category_id)
+    else:
+        catstr = "All"
+    if color_id:
+        for c in colorsarray:
+            if c[0] == color_id:
+                color_name = c[1]
+                color_hex = c[2]
+                break
+        if not color_name:
+            raise ValueError("Color with Id {} doesn't exist!".format(color_id))
+            return
+        color_rgb = hextorgb(color_hex)
+        colstr = "{} ({}, {}, {})".format(color_name, *color_rgb)
+    else:
+        colstr = "All"
+    vtree.insert("", 3, brick_name, text=brick_name, values=(catstr, bid, colstr))
 
 def update_brickdetail(brick_id, color_id):
     brick_name = ""
