@@ -196,6 +196,11 @@ def brickaddcmd(*args):
     pass
 def coloraddcmd(*args):
     pass
+def unselectcmd(*args):
+    stree.selection_remove(stree.selection())
+    ctree.selection_remove(ctree.selection())
+    btree.selection_remove(btree.selection())
+
 
 addframe = Frame(root)
 addframe.grid(row=1, column=0)
@@ -217,6 +222,12 @@ coloradd["text"] = "Add every Brick in this color(s)"
 coloradd["command"] = coloraddcmd
 #coloradd["background"] = "lightgray"
 coloradd.pack(side="left", fill="x", ipadx=20, ipady=20, pady=10, padx=10)
+
+unselect = Button(addframe)
+unselect["text"] = "Unselect all"
+unselect["command"] = unselectcmd
+#unselect["background"] = "lightgray"
+unselect.pack(side="left", fill="x", ipadx=20, ipady=20, pady=10, padx=10)
 #---------------------------------------------------------------------------
 
 viewframe = Frame(root)
@@ -271,6 +282,9 @@ colorlbl["text"] = "Color:"
 colorlbl.grid(row=4, column=0, sticky="w")
 colorlbl2 = Label(infoframe)
 colorlbl2.grid(row=4, column=1, sticky="w")
+
+def update_selection(sel_list):#sel_list = [brick_id, category_id, color_id]
+    pass
 
 def update_brickdetail(brick_id, color_id):
     brick_name = ""
