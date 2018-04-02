@@ -1,6 +1,7 @@
 from tkinter import *
-import tkinter.ttk
-#from tkinter.ttk import *
+#import tkinter.ttk
+
+from tkinter.ttk import Treeview
 #import ttk
 
 import csv, colorsys, time
@@ -8,6 +9,39 @@ from PIL import Image
 from PIL import ImageTk as ITK
 import numpy as np
 
+def hextorgb(hexw):
+    if hexw[0] == "#":
+        hexw = hexw[1:]
+    r = eval("0x"+hexw[0:2])
+    g = eval("0x"+hexw[2:4])
+    b = eval("0x"+hexw[4:6])
+    return r, g, b
+def treeview_sort_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children('')]
+    l.sort(reverse=reverse)
+
+    # rearrange items in sorted positions
+    for index, (val, k) in enumerate(l):
+        tv.move(k, '', index)
+
+    # reverse sort next time
+    tv.heading(col, command=lambda: \
+           treeview_sort_column(tv, col, not reverse))
+def treeview_sort_column_numeric(tv, col, index, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children('')]
+    #print(l)
+    try:
+        l.sort(reverse=reverse, key=lambda x: int(x))
+    except:
+        l.sort(reverse=reverse, key=lambda x: int(x[index]))
+
+    # rearrange items in sorted positions
+    for index, (val, k) in enumerate(l):
+        tv.move(k, '', index)
+
+    # reverse sort next time
+    tv.heading(col, command=lambda: \
+           treeview_sort_column(tv, col, not reverse))
 def get_partimage(part_id, color_id):
     return "../../lsorter_notgit/images/parts_" + str(color_id)+"/" + str(part_id) + ".png"
 
@@ -36,7 +70,7 @@ selectionframe.grid(row=0, column=0)
 brickchooser = LabelFrame(selectionframe)
 brickchooser["text"] = "Choose Brick"
 brickchooser.pack(side="left", fill="y")
-btree = ttk.Treeview(brickchooser)
+btree = Treeview(brickchooser)
 bscrollb = Scrollbar(brickchooser)
 
 btree["columns"]=("num")
@@ -75,7 +109,7 @@ for i_cat in range(57):
 colorchooser = LabelFrame(selectionframe)
 colorchooser["text"] = "Choose Color"
 colorchooser.pack(side="left", fill="y")
-ctree = ttk.Treeview(colorchooser)
+ctree = Treeview(colorchooser)
 cscrollb = Scrollbar(colorchooser)
 
 ctree["columns"]=("id", "is_trans", "html", "rgb", "hls")
@@ -129,7 +163,7 @@ sitems=[]
 brickfinder = LabelFrame(selectionframe)
 brickfinder["text"] = "Find Brick"
 brickfinder.pack(side="left", fill="y")
-stree = ttk.Treeview(brickfinder)
+stree = Treeview(brickfinder)
 sscrollb = Scrollbar(brickfinder)
 
 stree["columns"]=("id")
@@ -190,7 +224,7 @@ viewframe.grid(row=2, column=0)
 view = LabelFrame(viewframe)
 view["text"] = "Selection"
 view.pack(side="left", fill="y")
-vtree = ttk.Treeview(view)
+vtree = Treeview(view)
 vscrollb = Scrollbar(view)
 
 vtree["columns"]=("Category", "ID", "Color")
@@ -280,6 +314,9 @@ def update_brickdetail(brick_id, color_id):
 ##alternatively:
 #tree.insert("", 3, "dir3", text="Dir 3")
 #tree.insert("dir3", 3, text=" sub dir 3",values=("3A"," 3B"))
+
+
+
 
 
 
