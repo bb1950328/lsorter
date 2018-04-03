@@ -195,12 +195,7 @@ def preciseaddcmd(*args):
     cs = list(ctree.selection())
     bs = list(btree.selection())
     print(ss, cs, bs)
-    for sn in ss:
-        si = stree.item(sn)
-        print(si)
-        for cn in cs:
-            for bn in bs:
-                pass
+    
 def brickaddcmd(*args):
     pass
 def coloraddcmd(*args):
