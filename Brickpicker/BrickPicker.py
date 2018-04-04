@@ -59,7 +59,30 @@ catstrs = []
 for i in range(1, 58):
     catstrs.append(categoriesarray[i, 1])
 #print(catstrs)
-del categoriesarray
+categoriesarray
+
+def category_from_id(id):
+    for c in categoriesarray:
+        if [0] == str(id):
+            return c[1]
+    raise ValueError("Category with Id {} doesn't exist!".format(id))
+def category_to_id(cat):
+    for c in categoriesarray:
+        if c[1] == cat:
+            return c[0]
+    raise ValueError("Category with Id {} doesn't exist!".format(cat))
+def color_name_and_hex_from_id(id):
+    for c in colorsarray:
+        print(c)
+        if c[0] == id:
+            return c[1], c[2]
+    raise ValueError("Color with Id {} doesn't exist!".format(id))
+def brick_name_and_category_id_from_brick_id(id):
+    for p in partarray:
+        if p[0] == id:
+            return p[1], p[2]
+    raise ValueError("Part with Id {} doesn't exist!".format(id))
+    
 
 print("parts loaded.")
 
@@ -190,12 +213,41 @@ sscrollb.pack(side = "left", anchor = "w", expand=True, fill="y")
 
 #---------------------------------------------------------------------------
 
-def preciseaddcmd(*args):
-    ss = list(stree.selection())
+def preciseaddcmd(*args):#from brickchooser
+    apds = []
     cs = list(ctree.selection())
     bs = list(btree.selection())
-    print(ss, cs, bs)
+    print(cs, bs)
+    if not bs:
+        coloraddcmd()
+        return
+    if not cs:
+        brickaddcmd()
+        return
+    cids = []
+    bids = []
+    catids = []
+    for i in cs:
+        cids.append(ctree.item(i)["values"][0])
+    for i in bs:
+        if i[0] == "I":#i is a part, not a category
+            bids.append(btree.item(i)["values"][0])
+        else:
+            catids.append(category_to_id(i))
+    print(cids, bids, catids)
+    for co in cids:
+        for br in bids:
+            apds.append([br, None, co])
+        for ca in catids:
+            apds.append([None, ca, co])
+    for a in apds:
+        add_to_selection(*a)
     
+def preciseadd1cmd(*args):#from search
+    ss = list(stree.selection())
+    cs = list(ctree.selection())
+    print(ss, cs)
+
 def brickaddcmd(*args):
     pass
 def coloraddcmd(*args):
@@ -210,10 +262,16 @@ addframe = Frame(root)
 addframe.grid(row=1, column=0)
 
 preciseadd = Button(addframe)
-preciseadd["text"] = "Add only this selection"
+preciseadd["text"] = "Add only this selection (Choose Brick Frame)"
 preciseadd["command"] = preciseaddcmd
 #preciseadd["background"] = "lightgray"
 preciseadd.pack(side="left", fill="x", ipadx=20, ipady=20, pady=10, padx=10)
+
+preciseadd1 = Button(addframe)
+preciseadd1["text"] = "Add only this selection (Search Frame)"
+preciseadd1["command"] = preciseadd1cmd
+#preciseadd1["background"] = "lightgray"
+preciseadd1.pack(side="left", fill="x", ipadx=20, ipady=20, pady=10, padx=10)
 
 brickadd = Button(addframe)
 brickadd["text"] = "Add this Brick(s) in every color"
@@ -290,36 +348,16 @@ colorlbl2.grid(row=4, column=1, sticky="w")
 def add_to_selection(brick_id, category_id, color_id):#None if not specified
     bid = (brick_id if brick_id else "")
     if brick_id:
-        for p in partarray:
-            if p[0] == brick_id:
-                brick_name = p[1]
-                category_id = p[2]
-                break
-        if not brick_name:
-            raise ValueError("Part with Id {} doesn't exist!".format(brick_id))
-            return
+        brick_name = brick_name_from_id(brick_id)
     else:
         brick_name = "All"
     if category_id:
-        for c in categoriesarray:
-            if c[0] == category_id:
-                category_name = c[1]
-                break
-        if not category_name:
-            raise ValueError("Category with Id {} doesn't exist!".format(category_id))
-            return
+        category_name = category_from_id(category_id)
         catstr = "{} ({})".format(category_name, category_id)
     else:
         catstr = "All"
     if color_id:
-        for c in colorsarray:
-            if c[0] == color_id:
-                color_name = c[1]
-                color_hex = c[2]
-                break
-        if not color_name:
-            raise ValueError("Color with Id {} doesn't exist!".format(color_id))
-            return
+        color_name, color_hex = color_name_and_hex_from_id(color_id)
         color_rgb = hextorgb(color_hex)
         colstr = "{} ({}, {}, {})".format(color_name, *color_rgb)
     else:
@@ -331,29 +369,9 @@ def update_brickdetail(brick_id, color_id):
     category_name = ""
     color_name = ""
     color_rgb = ()
-    for p in partarray:
-        if p[0] == brick_id:
-            brick_name = p[1]
-            category_id = p[2]
-            break
-    if not brick_name:
-        raise ValueError("Part with Id {} doesn't exist!".format(brick_id))
-        return
-    for c in categoriesarray:
-        if c[0] == category_id:
-            category_name = c[1]
-            break
-    if not category_name:
-        raise ValueError("Category with Id {} doesn't exist!".format(category_id))
-        return
-    for c in colorsarray:
-        if c[0] == color_id:
-            color_name = c[1]
-            color_hex = c[2]
-            break
-    if not color_name:
-        raise ValueError("Color with Id {} doesn't exist!".format(color_id))
-        return
+    brick_name, category_id = brick_name_and_category_id_from_brick_id(brick_id)
+    category_name = category_from_id(category_id)
+    color_name, color_hex = color_name_and_hex_from_id(color_id)
     color_rgb = hextorgb(color_hex)
     namelbl2["text"] = brick_name
     idlbl2["text"] = brick_id
