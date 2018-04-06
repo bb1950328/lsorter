@@ -62,24 +62,32 @@ for i in range(1, 58):
 categoriesarray
 
 def category_from_id(id):
+    if not id:
+        return
     for c in categoriesarray:
         if c[0] == str(id):
             return c[1]
     raise ValueError("Category with Id {} doesn't exist!".format(id))
 def category_to_id(cat):
+    if not cat:
+        return
     for c in categoriesarray:
         if c[1] == cat:
             return c[0]
     raise ValueError("Category with Id {} doesn't exist!".format(cat))
 def color_name_and_hex_from_id(id):
+    if not id:
+        return
     for c in colorsarray:
-        print(c)
         if c[0] == str(id):
             return c[1], c[2]
     raise ValueError("Color with Id {} doesn't exist!".format(id))
 def brick_name_and_category_id_from_brick_id(id):
+    if not id:
+        return
     for p in partarray:
-        if p[0] == id:
+        print(p[0])
+        if p[0] == str(id):
             return p[1], p[2]
     raise ValueError("Part with Id {} doesn't exist!".format(id))
     
@@ -164,8 +172,6 @@ def search(*args):
     sitems=[]
     start = time.perf_counter()
     for part in partarray:
-        #print(part)
-        #print(part[1])
         n = True
         for term in terms:
             if not (term in part[1] and n):
@@ -177,7 +183,7 @@ def search(*args):
         results=partarray.copy()
     results.sort(key=lambda x: x[1], reverse=True)
     for r in results:
-        sitems.append(stree.insert("" , 0,    text=r[1], values=(r[2])))
+        sitems.append(stree.insert("" , 0,    text=r[1], values=(r[0])))
     if not results:
         sitems.append(stree.insert("" , 0,    text="Nothing found for"+term, values=()))
     stop = time.perf_counter()
@@ -244,6 +250,7 @@ def preciseaddcmd(*args):#from brickchooser
         add_to_selection(*a)
     
 def preciseadd1cmd(*args):#from search
+    apds = []
     ss = list(stree.selection())
     cs = list(ctree.selection())
     print(ss, cs)
@@ -273,7 +280,26 @@ def preciseadd1cmd(*args):#from search
         add_to_selection(*a)
 
 def brickaddcmd(*args):
-    pass
+    apds = []
+    bs = list(btree.selection())
+    print(bs)
+    if not bs:
+        preciseaddcmd()
+        return
+    bids = []
+    catids = []
+    for i in bs:
+        if i[0] == "I":#i is a part, not a category
+            bids.append(btree.item(i)["values"][0])
+        else:
+            catids.append(category_to_id(i))
+    print(bids, catids)
+    for br in bids:
+        apds.append([br, None, None])
+    for ca in catids:
+        apds.append([None, ca, None])
+    for a in apds:
+        add_to_selection(*a)
 def coloraddcmd(*args):
     pass
 def unselectcmd(*args):
@@ -374,7 +400,7 @@ colorlbl2.grid(row=4, column=1, sticky="w")
 def add_to_selection(brick_id, category_id, color_id):#None if not specified
     bid = (brick_id if brick_id else "")
     if brick_id:
-        brick_name = brick_name_from_id(brick_id)
+        brick_name = brick_name_and_category_id_from_brick_id(brick_id)
     else:
         brick_name = "All"
     if category_id:
@@ -389,6 +415,7 @@ def add_to_selection(brick_id, category_id, color_id):#None if not specified
     else:
         colstr = "All"
     vtree.insert("", 3, brick_name, text=brick_name, values=(catstr, bid, colstr))
+    update_brickdetail(brick_id, color_id)
     selectionlist.append([brick_id, category_id, color_id])
 
 def update_brickdetail(brick_id, color_id):
@@ -405,6 +432,9 @@ def update_brickdetail(brick_id, color_id):
     catlbl2["text"] = "{} ({})".format(category_name, category_id)
     colorlbl2["text"] = "{} ({}, {}, {})".format(color_name, *color_rgb)
     colorlbl2["fg"] = "#" + color_hex
+    pimg = ITK.PhotoImage(Image.open(get_partimage(brick_id, color_id)).resize((125, 125)))
+    print(pimg)
+    pimgcv.create_image(0, 0, image=pimg, anchor="nw")
 #tree.insert("" , 0,    text="Line 1", values=("1A","1b"))
 
 #id2 = tree.insert("", 1, "dir2", text="Dir 2")
