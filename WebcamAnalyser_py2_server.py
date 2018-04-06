@@ -12,15 +12,18 @@ import numpy
 from Tkinter import *
 import pickle
 """
-R    G    B     Index   Name
-(255,   0,   0)     0   Red
-(  0, 100,  10)     1   Green
-(  0,  35, 255)     2   Blue
-(255, 255,   0)     3   Yellow
+R    G    B     Index   Name       H1  H2  L1  L2  S1  S2
+(255,   0,   0)     0   Red        150 180 100 120 --- ---
+(  0, 100,  10)     1   Green       60  90   0  40 --- ---
+(  0,  35, 255)     2   Blue         0  10  20  60 --- ---
+(255, 255,   0)     3   Yellow     140 150  60 100 --- ---
 (160, 160, 160)     4   Light Gray
 ( 30,  30,  30)     5   Dark Gray
 (  0,   0,   0)     6   Black
 ( 30, 100, 100)     7   White
+"""
+"""
+H1  H2  L1  L2  S1  S2
 """
 class WebcamAnalyser():
     def __init__(self, camport = 0):
@@ -222,6 +225,21 @@ class WebcamAnalyser():
                     cv2.imwrite("captured" + str(time.time()) + ".png", frame)
                 return am
             x += 1
+    def analyse_firstrow3(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
+        frame = self.vstream.read()
+        so2.sendto(pickle.dumps(frame[1]), ("192.168.178.31", 56789))
+        stat= numpy.zeros(8)
+        x = x1crop
+        ppxjump = pxjump
+        x2crop = 640-x2crop-1
+        while x < x2crop:
+            stat[self.next_color(frame[1, x])] += 1
+            if numpy.max(stat) >= tr:
+                am = numpy.argmax(stat)
+                if am != 7 and save_on_desktop:
+                    cv2.imwrite("captured" + str(time.time()) + ".png", frame)
+                return am
+            x += 1
     def process_frame(self, wait_on_motion=0, analyse=True, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         "wait_on_motion = treshold num of pixels changed 0 = disable, if not analyse -> returns frame else color (0=Red, 1=Green, 2=Blue)"
         if wait_on_motion < 0:
@@ -231,12 +249,12 @@ class WebcamAnalyser():
             #time.sleep(4)
         frame = self.vstream.read()
         if save_on_desktop:
-            cv2.imwrite("captured" + str(time.time()) + ".png", frame)
+            cv2.imwrite("./captured/captured" + str(time.time()) + ".png", frame)
         if not analyse:
             return frame
         else:
             start = time.time()
-            n = self.wordcolors[self.analyse_firstrow2(pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)]
+            n = self.wordcolors[self.analyse_firstrow3(pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)]
             stop = time.time()
             return (n, max(0, 8.25-(stop-start)))
     def whitelog(self, n=10):
