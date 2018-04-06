@@ -63,7 +63,7 @@ categoriesarray
 
 def category_from_id(id):
     for c in categoriesarray:
-        if [0] == str(id):
+        if c[0] == str(id):
             return c[1]
     raise ValueError("Category with Id {} doesn't exist!".format(id))
 def category_to_id(cat):
@@ -74,7 +74,7 @@ def category_to_id(cat):
 def color_name_and_hex_from_id(id):
     for c in colorsarray:
         print(c)
-        if c[0] == id:
+        if c[0] == str(id):
             return c[1], c[2]
     raise ValueError("Color with Id {} doesn't exist!".format(id))
 def brick_name_and_category_id_from_brick_id(id):
@@ -247,6 +247,30 @@ def preciseadd1cmd(*args):#from search
     ss = list(stree.selection())
     cs = list(ctree.selection())
     print(ss, cs)
+    if not ss:
+        coloraddcmd()
+        return
+    if not cs:
+        brickaddcmd()
+        return
+    cids = []
+    sids = []
+    catids = []
+    for i in cs:
+        cids.append(ctree.item(i)["values"][0])
+    for i in ss:
+        if i[0] == "I":#i is a part, not a category
+            sids.append(stree.item(i)["values"][0])
+        else:
+            catids.append(category_to_id(i))
+    print(cids, sids, catids)
+    for co in cids:
+        for sr in sids:
+            apds.append([sr, None, co])
+        for ca in catids:
+            apds.append([None, ca, co])
+    for a in apds:
+        add_to_selection(*a)
 
 def brickaddcmd(*args):
     pass
@@ -291,6 +315,8 @@ unselect["command"] = unselectcmd
 #unselect["background"] = "lightgray"
 unselect.pack(side="left", fill="x", ipadx=20, ipady=20, pady=10, padx=10)
 #---------------------------------------------------------------------------
+
+selectionlist = []
 
 viewframe = Frame(root)
 viewframe.grid(row=2, column=0)
@@ -363,6 +389,7 @@ def add_to_selection(brick_id, category_id, color_id):#None if not specified
     else:
         colstr = "All"
     vtree.insert("", 3, brick_name, text=brick_name, values=(catstr, bid, colstr))
+    selectionlist.append([brick_id, category_id, color_id])
 
 def update_brickdetail(brick_id, color_id):
     brick_name = ""
