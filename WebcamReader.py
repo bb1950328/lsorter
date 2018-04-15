@@ -29,8 +29,10 @@ try:
 	data = ""
     while True:
         if data == "capture":
-            txsock.sendto(c.encode(), txaddr)
-            time.sleep(0.1)
+			n = False
+			while not n:
+				n, img = vstream.read()
+            txsock.sendto("done".encode(), txaddr)
         data, addr = rxsock.recvfrom(1024)
         data = data.decode()
         print "[" + str(addr) + "] has sent \"" + data + "\""
