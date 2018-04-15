@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{61b9a876-1128-43cd-b157-f7f2f91b19e0}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>WebcamReader.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Brickpicker\BrickPicker.py" />
+    <Compile Include="LSorterGUI\lsorter_gui.py" />
+    <Compile Include="lsorter_lib.py" />
+    <Compile Include="py2server.py" />
+    <Compile Include="rowreceiver.py" />
+    <Compile Include="servotest.py" />
+    <Compile Include="WebcamAnalyser_py2_server.py" />
+    <Compile Include="WebcamAnalyser_py2_server_old.py" />
+    <Compile Include="WebcamReader.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ANW\03_09_18\20180309_125443.jpg" />
+    <Content Include="ANW\03_09_18\20180309_131428.jpg" />
+    <Content Include="ANW\03_09_18\20180309_135500.jpg" />
+    <Content Include="ANW\03_09_18\20180309_135503.jpg" />
+    <Content Include="ANW\03_09_18\20180309_135508.jpg" />
+    <Content Include="ANW\03_09_18\20180309_135606.jpg" />
+    <Content Include="ANW\03_09_18\20180309_140425.jpg" />
+    <Content Include="ANW\03_09_18\20180309_140459.jpg" />
+    <Content Include="ANW\03_09_18\20180309_140501.jpg" />
+    <Content Include="ANW\03_09_18\20180309_140858.jpg" />
+    <Content Include="ANW\03_09_18\20180309_141635.jpg" />
+    <Content Include="ANW\03_09_18\20180309_143353.jpg" />
+    <Content Include="ANW\03_09_18\20180309_150140.jpg" />
+    <Content Include="ANW\03_09_18\20180309_154752.jpg" />
+    <Content Include="ANW\03_09_18\20180309_154803.jpg" />
+    <Content Include="ANW\03_09_18\20180309_155224.jpg" />
+    <Content Include="ANW\03_09_18\20180309_155234.jpg" />
+    <Content Include="ANW\03_09_18\20180309_155324.jpg" />
+    <Content Include="ANW\03_09_18\20180309_155800.jpg" />
+    <Content Include="ANW\03_09_18\20180309_155916.jpg" />
+    <Content Include="ANW\03_09_18\20180309_160314.jpg" />
+    <Content Include="ANW\03_09_18\20180309_164937.jpg" />
+    <Content Include="ANW\03_09_18\20180309_172632.jpg" />
+    <Content Include="ANW\03_09_18\20180309_181330.jpg" />
+    <Content Include="ANW\03_16_18\20180316_120426.jpg" />
+    <Content Include="ANW\03_16_18\20180316_125206.jpg" />
+    <Content Include="ANW\03_16_18\20180316_125915.jpg" />
+    <Content Include="ANW\03_16_18\20180316_125918.jpg" />
+    <Content Include="ANW\03_16_18\20180316_130117.jpg" />
+    <Content Include="ANW\03_16_18\20180316_134607.jpg" />
+    <Content Include="ANW\03_16_18\20180316_135939.jpg" />
+    <Content Include="ANW\03_16_18\20180316_140852.jpg" />
+    <Content Include="ANW\03_16_18\20180316_141538.jpg" />
+    <Content Include="ANW\03_16_18\20180316_143823.jpg" />
+    <Content Include="ANW\03_16_18\20180316_150942.jpg" />
+    <Content Include="ANW\03_16_18\20180316_155648.jpg" />
+    <Content Include="ANW\03_16_18\20180316_155652.jpg" />
+    <Content Include="ANW\03_16_18\20180316_165022.jpg" />
+    <Content Include="ANW\03_16_18\20180316_165034.jpg" />
+    <Content Include="ANW\03_16_18\20180316_165038.jpg" />
+    <Content Include="ANW\03_16_18\20180316_173715.jpg" />
+    <Content Include="ANW\03_16_18\20180316_173722.jpg" />
+    <Content Include="ANW\03_16_18\20180316_173829.jpg" />
+    <Content Include="ANW\03_16_18\20180316_175927.jpg" />
+    <Content Include="ANW\03_16_18\20180316_175933.jpg" />
+    <Content Include="ImgColorAnalyse\diewelle.jpg" />
+    <Content Include="ImgColorAnalyse\DSC10.JPG" />
+    <Content Include="ImgColorAnalyse\DSC11.JPG" />
+    <Content Include="ImgColorAnalyse\DSC12.JPG" />
+    <Content Include="ImgColorAnalyse\DSC13.JPG" />
+    <Content Include="ImgColorAnalyse\DSC14.JPG" />
+    <Content Include="ImgColorAnalyse\DSC15.JPG" />
+    <Content Include="ImgColorAnalyse\DSC16.JPG" />
+    <Content Include="ImgColorAnalyse\DSC17.JPG" />
+    <Content Include="ImgColorAnalyse\DSC18.JPG" />
+    <Content Include="ImgColorAnalyse\DSC19.JPG" />
+    <Content Include="ImgColorAnalyse\DSC20.JPG" />
+    <Content Include="ImgColorAnalyse\DSC21.JPG" />
+    <Content Include="ImgColorAnalyse\DSC22.JPG" />
+    <Content Include="ImgColorAnalyse\DSC23.JPG" />
+    <Content Include="ImgColorAnalyse\DSC24.JPG" />
+    <Content Include="ImgColorAnalyse\DSC25.JPG" />
+    <Content Include="ImgColorAnalyse\DSC26.JPG" />
+    <Content Include="ImgColorAnalyse\DSC27.JPG" />
+    <Content Include="ImgColorAnalyse\DSC28.JPG" />
+    <Content Include="ImgColorAnalyse\DSC29.JPG" />
+    <Content Include="ImgColorAnalyse\DSC30.JPG" />
+    <Content Include="ImgColorAnalyse\DSC31.JPG" />
+    <Content Include="ImgColorAnalyse\DSC32.JPG" />
+    <Content Include="ImgColorAnalyse\DSC33.JPG" />
+    <Content Include="ImgColorAnalyse\DSC34.JPG" />
+    <Content Include="ImgColorAnalyse\DSC35.JPG" />
+    <Content Include="ImgColorAnalyse\DSC36.JPG" />
+    <Content Include="ImgColorAnalyse\DSC37.JPG" />
+    <Content Include="ImgColorAnalyse\DSC38.JPG" />
+    <Content Include="ImgColorAnalyse\DSC39.JPG" />
+    <Content Include="ImgColorAnalyse\DSC40.JPG" />
+    <Content Include="ImgColorAnalyse\DSC41.JPG" />
+    <Content Include="ImgColorAnalyse\DSC42.JPG" />
+    <Content Include="ImgColorAnalyse\DSC43.JPG" />
+    <Content Include="ImgColorAnalyse\DSC44.JPG" />
+    <Content Include="ImgColorAnalyse\help_cv2.txt" />
+    <Content Include="ImgColorAnalyse\IMG10.JPG" />
+    <Content Include="ImgColorAnalyse\IMG11.JPG" />
+    <Content Include="ImgColorAnalyse\IMG12.JPG" />
+    <Content Include="ImgColorAnalyse\IMG13.JPG" />
+    <Content Include="ImgColorAnalyse\IMG14.JPG" />
+    <Content Include="ImgColorAnalyse\IMG15.JPG" />
+    <Content Include="ImgColorAnalyse\IMG16.JPG" />
+    <Content Include="ImgColorAnalyse\IMG17.JPG" />
+    <Content Include="ImgColorAnalyse\IMG18.JPG" />
+    <Content Include="ImgColorAnalyse\IMG19.JPG" />
+    <Content Include="ImgColorAnalyse\IMG20.JPG" />
+    <Content Include="ImgColorAnalyse\IMG21.JPG" />
+    <Content Include="ImgColorAnalyse\IMG22.JPG" />
+    <Content Include="ImgColorAnalyse\IMG23.JPG" />
+    <Content Include="ImgColorAnalyse\IMG24.JPG" />
+    <Content Include="ImgColorAnalyse\IMG25.JPG" />
+    <Content Include="ImgColorAnalyse\IMG26.JPG" />
+    <Content Include="ImgColorAnalyse\IMG27.JPG" />
+    <Content Include="ImgColorAnalyse\IMG28.JPG" />
+    <Content Include="ImgColorAnalyse\IMG29.JPG" />
+    <Content Include="ImgColorAnalyse\IMG30.JPG" />
+    <Content Include="ImgColorAnalyse\IMG31.JPG" />
+    <Content Include="ImgColorAnalyse\IMG32.JPG" />
+    <Content Include="ImgColorAnalyse\IMG33.JPG" />
+    <Content Include="ImgColorAnalyse\IMG34.JPG" />
+    <Content Include="ImgColorAnalyse\Test1.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ANW\" />
+    <Folder Include="ANW\03_09_18" />
+    <Folder Include="ANW\03_16_18" />
+    <Folder Include="Brickpicker" />
+    <Folder Include="ImgColorAnalyse" />
+    <Folder Include="LSorterGUI" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|2.7-32" />
+    <InterpreterReference Include="Global|PythonCore|3.6" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

@@ -12,7 +12,7 @@ try:
 	from imutils.video import WebcamVideoStream, FPS
 except:
 	pass
-
+print(sys.version)
 aparser = ArgumentParser(description = "script to capture and send webcam images via UDP")
 aparser.add_argument("-c", "--camera", dest = "camera", metavar = "Video device", type = int, help = "Which video device to use", default = 0)
 aparser.add_argument("-i", "--ip", dest = "ip", metavar = "IP", type = str, help = "IP Address of the frame analyzer", default = "127.0.0.1")
@@ -21,5 +21,21 @@ aparser.add_argument("-r", "--rx-port", dest = "rxport", metavar = "RX Port", ty
 aparser.add_argument("-p", "--predictive-capturing", dest = "pcap", metavar = "Predictive capturing", type = str, help = "En/disable predictive capturing (yes or no)", default = "yes", choices=["yes", "no"])
 args = aparser.parse_args()
 txsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+txaddr = (args.ip, args.txport)
 rxsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rxsock.bind((args.ip, args.rxport))
+vstream = WebcamVideoStream(src=args.camera).start()
+try:
+	data = ""
+    while True:
+        if data == "capture":
+            txsock.sendto(c.encode(), txaddr)
+            time.sleep(0.1)
+        data, addr = rxsock.recvfrom(1024)
+        data = data.decode()
+        print "[" + str(addr) + "] has sent \"" + data + "\""
+except:
+	pass
+finally:
+    txsock.close()
+	rxsock.close()
