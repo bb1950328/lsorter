@@ -14,10 +14,11 @@ import pickle
 import colorsys
 """
 R    G    B     Index   Name       H1  H2  L1  L2  S1  S2
-(255,   0,   0)     0   Red        150 180 100 120 --- ---
-(  0, 100,  10)     1   Green       60  90   0  40 --- ---
-(  0,  35, 255)     2   Blue         0  10  20  60 --- ---
+(255,   0,   0)     0   Red        150 180  80 110 --- ---
+(  0, 100,  10)     1   Green       60  90 100 125 --- ---
+(  0,  35, 255)     2   Blue         0  10 100 125 --- ---
 (255, 255,   0)     3   Yellow     140 150  60 100 --- ---
+(255, 255,   0)     3   Yellow2     -1  -1 110 120 130 140
 (160, 160, 160)     4   Light Gray
 ( 30,  30,  30)     5   Dark Gray
 (  0,   0,   0)     6   Black
@@ -30,8 +31,8 @@ class WebcamAnalyser():
         self.vstream = WebcamVideoStream(src=0).start()
         self.fps = FPS().start()
         self.rgbcolors = numpy.array(((255,   0,   0), (  0, 100,   10), (  0,  35, 255), (255, 255,   0), (160, 160, 160), ( 30,  30,  30), (  0,   0,   0), (30, 100, 100)))
-        self.hlscolors = numpy.array(((150, 180, 100, 120, -1, -1), (60, 90, 0, 40, -1, -1), (0, 10, 20, 60, -1, -1), (140, 150, 60, 100, -1, -1), (), (), (), (), (120, 170, -1, -1, 160, 260)))
-        self.wordcolors = ["Red", "Green", "Blue", "Yellow", "Light Gray", "Dark Gray", "Black", "White"]
+        self.hlscolors = numpy.array(((150, 180, 80, 110, -1, -1), (60, 110, 40, 55, -1, -1), (0, 10, 100, 130, -1, -1), (135, 155, 80, 130, -1, -1), (), (), (), (), (120, 170, -1, -1, 160, 260)))
+        self.wordcolors = ["Red", "Green", "Blue", "Yellow", "Light Gray", "Dark Gray", "Black", "White", "No Color"]
         self.rowfile = open("./captured/captured.db", "ab")
         self.isender = ImageSender()
         try:
@@ -176,24 +177,40 @@ class WebcamAnalyser():
         return am
     def next_color_hls(self, value, multiple=False):#value is rgb 0..255
         h, l, s = [n*255 for n in list(colorsys.rgb_to_hls(*[v/255 for v in value]))]
+        #print(h, l, s)
         matchis = []
-        for i in range(8):
-            if (self.hlscolors[i][0] <= h <= self.hlscolors[i][1]) or (self.hlscolors[i][0] == -1 and self.hlscolors[i][1] == -1):
-                hn = True                                             
-            if (self.hlscolors[i][2] <= h <= self.hlscolors[i][3]) or (self.hlscolors[i][2] == -1 and self.hlscolors[i][3] == -1):
-                ln = True                                             
-            if (self.hlscolors[i][4] <= h <= self.hlscolors[i][5]) or (self.hlscolors[i][4] == -1 and self.hlscolors[i][5] == -1):
-                sn = True
-            if hn and ln and sn:
-                if multiple:
-                    matchis.append(i)
-                else:
-                    return i
+        for i in range(9):
+            
+            #print i
+            try:
+                hn = (self.hlscolors[i][0] == -1 and self.hlscolors[i][1] == -1)
+                ln = (self.hlscolors[i][2] == -1 and self.hlscolors[i][3] == -1)
+                sn = (self.hlscolors[i][4] == -1 and self.hlscolors[i][5] == -1)
+                #print(hn, ln, sn)
+                #print self.hlscolors[i][0], "<=", h, "<=", self.hlscolors[i][1], "'"
+                #print self.hlscolors[i][2], "<=", l, "<=", self.hlscolors[i][3], "'"
+                #print self.hlscolors[i][4], "<=", s, "<=", self.hlscolors[i][5], "'"
+                if (self.hlscolors[i][0] <= h <= self.hlscolors[i][1]) or hn:
+                    hn = True                                             
+                if (self.hlscolors[i][2] <= l <= self.hlscolors[i][3]) or ln:
+                    ln = True                                             
+                if (self.hlscolors[i][4] <= s <= self.hlscolors[i][5]) or sn:
+                    sn = True
+                #print(hn, ln, sn)
+                #print
+                if hn and ln and sn:
+                    if multiple:
+                        matchis.append(i)
+                    else:
+                        #print i
+                        return i
+            except:
+                continue
         if multiple:
             print value, "appears to be ", "or".join(matchis)
             return matchis
         else:
-            print value, "doesn't match to any color."
+            #print value, (round(h, 2), round(l, 2), round(s, 2)), "\t\tdoesn't match to any color."
             return 8
     def analyse_firstrow(self, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         frame = self.vstream.read()
@@ -249,19 +266,22 @@ class WebcamAnalyser():
                 return am
             x += 1
     def analyse_firstrow3(self, frame, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
-        so2.sendto(pickle.dumps(frame[1]), ("192.168.178.31", 56789))
+        #so2.sendto(pickle.dumps(frame[1]), ("192.168.178.31", 56789))
         stat= numpy.zeros(9)
         x = x1crop
         ppxjump = pxjump
-        x2crop = 640-x2crop-1
+        x2crop = 64-x2crop-1
         while x < x2crop:
             stat[self.next_color_hls(frame[1, x])] += 1
-            if numpy.max(stat) >= tr:
-                am = numpy.argmax(stat)
-                if am != 7 and save_on_desktop:
-                    cv2.imwrite("captured" + str(time.time()) + ".png", frame)
+            if numpy.max(stat[:-1]) >= tr:
+                print "treshold reached."
+                am = numpy.argmax(stat[:-1])
+                print am
                 return am
+            #print stat
             x += 1
+        print stat
+        return numpy.argmax(stat)
     def hlscolorlog(self, frame, pxjump=4, tr=400, bt=30, x1crop=75, x2crop=75, save_on_desktop=False):
         #stat= numpy.zeros(8)
         x = 4
@@ -292,15 +312,17 @@ class WebcamAnalyser():
             self.wait_for_brick(0, treshold=wait_on_motion)
             #time.sleep(4)
         frame = self.vstream.read()
+        frame = cv2.resize(frame,(64, 48), interpolation=cv2.INTER_AREA)
         if save_on_desktop:
             cv2.imwrite("./captured/captured" + str(time.time()) + ".png", frame)
         if not analyse:
             return frame
         else:
             start = time.time()
-            n = self.wordcolors[self.analyse_firstrow3(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)]
+            af = self.analyse_firstrow3(frame, pxjump=pxjump, tr=tr, bt=bt, x1crop=x1crop, x2crop=x2crop)
+            n = self.wordcolors[af]
             stop = time.time()
-            return (n, max(0, 8.25-(stop-start)))
+            return (n, max(0, 8.15-(stop-start)))
     def whitelog(self, n=10):
         f = open("whitelog.csv", "a")
         for i in range(10):
@@ -330,10 +352,10 @@ wc = WebcamAnalyser()
 wait_on_motion=0
 analyse=True
 pxjump=16
-tr=5
+tr=10
 bt=30
-x1crop=75
-x2crop=75
+x1crop=5
+x2crop=5
 ###
 ###
 try:

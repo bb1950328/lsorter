@@ -22,8 +22,10 @@ from threading import Thread
 
 print("imported modules")
 
-if on_pi:
-    os.system("pigpiod")
+try:
+    pi = pigpio.pi()
+except:#when daemon isn't running
+    os.system("sudo pigpiod")
     pi = pigpio.pi()
 
 class slideturner():
@@ -148,9 +150,10 @@ class Coordinator():
         self.si = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.si.bind(("localhost", 54321))
         #self.belt = unipolarstepper([17, 27, 22, 10])
-        self.slide = slideturner(3)
+        self.slide = slideturner(4)
     def start(self):
         #self.belt.drive_rpm(0)
+        self.slide.goto_box(0, False, verbose=False, delay=0)
         while True:
             self.so.sendto(b"wait", ("localhost", 12345))
             print("sent request.")
@@ -162,6 +165,8 @@ class Coordinator():
                 self.slide.goto_box(1, False, verbose=False, delay=delay)
             elif color.decode() == "Blue":
                 self.slide.goto_box(2, False, verbose=False, delay=delay)
+            elif color.decode() == "Yellow":
+                self.slide.goto_box(3, False, verbose=False, delay=delay)
             print(color, delay)
 
 print("Initalised classes.")
