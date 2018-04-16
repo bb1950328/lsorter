@@ -26,13 +26,18 @@ rxsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 rxsock.bind((args.ip, args.rxport))
 vstream = WebcamVideoStream(src=args.camera).start()
 try:
-	data = ""
+	data = "capture"
     while True:
         if data == "capture":
 			n = False
 			while not n:
 				n, img = vstream.read()
-            txsock.sendto("done".encode(), txaddr)
+            txsock.sendto("done".encode("utf-8"), txaddr)
+		elif data == "1strow":
+			txsock.sendto(pickle.dumps(img[0,:]).encode("utf-8"), txaddr)
+		elif data == "allrows":
+			for x in range(len(img[:,0])):
+				txsock.sendto(pickle.dumps(img[x,:]).encode("utf-8"), txaddr)
         data, addr = rxsock.recvfrom(1024)
         data = data.decode()
         print "[" + str(addr) + "] has sent \"" + data + "\""
