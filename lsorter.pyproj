@@ -11,7 +11,8 @@
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>Global|PythonCore|2.7-32</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -20,16 +21,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Brickpicker\BrickPicker.py" />
+    <Compile Include="FrameAnalyser.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="LSorterGUI\lsorter_gui.py" />
     <Compile Include="lsorter_lib.py" />
     <Compile Include="py2server.py" />
     <Compile Include="rowreceiver.py" />
     <Compile Include="servotest.py" />
+    <Compile Include="SlideController.py" />
     <Compile Include="WebcamAnalyser_py2_server.py" />
     <Compile Include="WebcamAnalyser_py2_server_old.py" />
     <Compile Include="WebcamReader.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include=".ipynb_checkpoints\lsorter-checkpoint.ipynb" />
+    <Content Include=".vs\ProjectSettings.json" />
+    <Content Include=".vs\slnx.sqlite" />
+    <Content Include=".vs\VSWorkspaceState.json" />
     <Content Include="ANW\03_09_18\20180309_125443.jpg" />
     <Content Include="ANW\03_09_18\20180309_131428.jpg" />
     <Content Include="ANW\03_09_18\20180309_135500.jpg" />
@@ -75,6 +85,22 @@
     <Content Include="ANW\03_16_18\20180316_173829.jpg" />
     <Content Include="ANW\03_16_18\20180316_175927.jpg" />
     <Content Include="ANW\03_16_18\20180316_175933.jpg" />
+    <Content Include="Arbeiten_ausserhalb.docx" />
+    <Content Include="Arbeiten_ausserhalb.odt" />
+    <Content Include="Arbeiten_ausserhalb.pdf" />
+    <Content Include="AutoSave_LSorter.skp" />
+    <Content Include="Brickpicker\.ipynb_checkpoints\BrickPicker-checkpoint.ipynb" />
+    <Content Include="Brickpicker\BrickPicker.ipynb" />
+    <Content Include="Brickpicker\layout.xlsx" />
+    <Content Include="Brickpicker\library\colors.csv" />
+    <Content Include="Brickpicker\library\parts.csv" />
+    <Content Include="Brickpicker\library\parts_sorted.csv" />
+    <Content Include="Brickpicker\library\part_categories.csv" />
+    <Content Include="Brickpicker\library\sets.csv" />
+    <Content Include="CODE_OF_CONDUCT.md" />
+    <Content Include="HSL_statistics.xlsx" />
+    <Content Include="ImgColorAnalyse\.ipynb_checkpoints\objectrecognitiontest-checkpoint.ipynb" />
+    <Content Include="ImgColorAnalyse\.ipynb_checkpoints\Untitled-checkpoint.ipynb" />
     <Content Include="ImgColorAnalyse\diewelle.jpg" />
     <Content Include="ImgColorAnalyse\DSC10.JPG" />
     <Content Include="ImgColorAnalyse\DSC11.JPG" />
@@ -138,14 +164,33 @@
     <Content Include="ImgColorAnalyse\IMG33.JPG" />
     <Content Include="ImgColorAnalyse\IMG34.JPG" />
     <Content Include="ImgColorAnalyse\Test1.bmp" />
+    <Content Include="LICENSE" />
+    <Content Include="lsorter.ipynb" />
+    <Content Include="LSorter.skb" />
+    <Content Include="LSorter.skp" />
+    <Content Include="punachmittage.ods" />
+    <Content Include="README.md" />
+    <Content Include="whitelog.csv" />
+    <Content Include="white_hls.csv" />
+    <Content Include="Zeitplan.xlsx" />
+    <Content Include="__pycache__\lsorter_lib.cpython-35.pyc" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".ipynb_checkpoints\" />
+    <Folder Include=".vs\" />
+    <Folder Include=".vs\lsorter\" />
+    <Folder Include=".vs\lsorter\v15\" />
     <Folder Include="ANW\" />
     <Folder Include="ANW\03_09_18" />
     <Folder Include="ANW\03_16_18" />
     <Folder Include="Brickpicker" />
+    <Folder Include="Brickpicker\.ipynb_checkpoints\" />
+    <Folder Include="Brickpicker\library\" />
+    <Folder Include="captured\" />
     <Folder Include="ImgColorAnalyse" />
+    <Folder Include="ImgColorAnalyse\.ipynb_checkpoints\" />
     <Folder Include="LSorterGUI" />
+    <Folder Include="__pycache__\" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|2.7-32" />

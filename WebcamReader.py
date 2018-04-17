@@ -16,8 +16,8 @@ print(sys.version)
 aparser = ArgumentParser(description = "script to capture and send webcam images via UDP")
 aparser.add_argument("-c", "--camera", dest = "camera", metavar = "Video device", type = int, help = "Which video device to use", default = 0)
 aparser.add_argument("-i", "--ip", dest = "ip", metavar = "IP", type = str, help = "IP Address of the frame analyzer", default = "127.0.0.1")
-aparser.add_argument("-t", "--tx-port", dest = "txport", metavar = "TX Port", type = int, help = "Port to send the images (Default 50000)", default = 50000)
-aparser.add_argument("-r", "--rx-port", dest = "rxport", metavar = "RX Port", type = int, help = "Port to receive commands (Default 50001)", default = 50001)
+aparser.add_argument("-t", "--tx-port", dest = "txport", metavar = "TX Port", type = int, help = "Port to send the images (Default 50001)", default = 50001)
+aparser.add_argument("-r", "--rx-port", dest = "rxport", metavar = "RX Port", type = int, help = "Port to receive commands (Default 50000)", default = 50000)
 aparser.add_argument("-p", "--predictive-capturing", dest = "pcap", metavar = "Predictive capturing", type = str, help = "En/disable predictive capturing (yes or no)", default = "yes", choices=["yes", "no"])
 args = aparser.parse_args()
 txsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,12 +27,12 @@ rxsock.bind((args.ip, args.rxport))
 vstream = WebcamVideoStream(src=args.camera).start()
 try:
 	data = "capture"
-    while True:
-        if data == "capture":
+	while True:
+		if data == "capture":
 			n = False
 			while not n:
 				n, img = vstream.read()
-            txsock.sendto("done".encode("utf-8"), txaddr)
+			txsock.sendto("done".encode("utf-8"), txaddr)
 		elif data == "1strow":
 			txsock.sendto(pickle.dumps(img[0,:]).encode("utf-8"), txaddr)
 		elif data == "allrows":
@@ -44,5 +44,5 @@ try:
 except:
 	pass
 finally:
-    txsock.close()
+	txsock.close()
 	rxsock.close()
