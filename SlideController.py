@@ -41,7 +41,9 @@ class slideturner():
         if verbose:
             print("Angle:", angle, "\tPulselength:", pulse)
         return pulse
-    def goto_box(self, box, really_delay, verbose=True, delay=0):
+    def goto_box(self, box, really_delay, verbose=False, delay=0):
+        if box > self.num_boxes or box < 0:
+            return False
         if delay:
             self.thread = Thread(target=self.goto_box, args=(box, delay))
             self.thread.start()
